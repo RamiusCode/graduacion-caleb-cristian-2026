@@ -1,0 +1,203 @@
+---
+// src/components/NombresFlores.astro
+// Primera sección: el birrete, "Mi Graduación", el nombre del egresado y
+// su carrera. Copia del diseño de referencia (Canva, Harold Alberto).
+//
+// Los datos van acá arriba, en un solo lugar (salen de información.txt).
+const titulo = "Mi Graduación";
+const nombre = "Caleb Cristian";
+const apellidos = "Cespedes Agreda";
+const lineaUno = "Licenciatura en";
+const lineaDos = "Bioquímica y Farmacia";
+---
+
+<section id="sobre-novios" class="seccion">
+    <!-- Birrete: la caja lo espeja para que la borla cuelgue a la izquierda -->
+    <span class="nf-birrete-caja">
+        <img
+            class="nf-birrete"
+            src="/imagenes/gorro.png"
+            width="338"
+            height="172"
+            alt=""
+            aria-hidden="true"
+        />
+    </span>
+
+    <h2 class="nf-titulo">{titulo}</h2>
+    <span class="nf-linea" aria-hidden="true"></span>
+    <h1 class="nf-nombre">{nombre}</h1>
+    <p class="nf-apellidos">{apellidos}</p>
+    <p class="nf-carrera">
+        <span>{lineaUno}</span>
+        <span class="nf-carrera-fuerte">“{lineaDos}”</span>
+    </p>
+</section>
+
+<style>
+    /*
+       El fondo va declarado como degradado y no como color: el modo
+       oscuro forzado oscurece colores pero respeta las imágenes.
+       Celeste muy pálido arriba, como en el diseño de referencia.
+    */
+    /*
+       La sección mide lo que mide su contenido: nada de pantalla
+       completa. Los tamaños van en vw (con tope por la columna de 430px)
+       para que guarden la misma proporción que el diseño de referencia.
+    */
+    .seccion {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 16px 16px;
+        text-align: center;
+        background-image: radial-gradient(
+                ellipse at 50% 55%,
+                #ffffff 0%,
+                rgba(255, 255, 255, 0) 70%
+            ),
+            linear-gradient(180deg, #e3eff4 0%, #f4f9fb 100%);
+    }
+
+    .nf-birrete {
+        display: block;
+        width: 100%;
+        height: auto;
+        transform: rotate(-6deg);
+        filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.22));
+    }
+
+    .nf-birrete-caja {
+        display: block;
+        width: 46%;
+        max-width: 190px;
+        transform: scaleX(-1);
+    }
+
+    .nf-titulo {
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: min(8.8vw, 2.4rem);
+        line-height: 1.1;
+        color: #8c8c8c;
+        text-shadow: 0 2px 3px rgba(0, 0, 0, 0.18);
+        margin-top: 18px;
+    }
+
+    /* La raya fina debajo de "Mi Graduación" */
+    .nf-linea {
+        display: block;
+        width: 78%;
+        height: 1px;
+        margin: 12px 0 18px;
+        background-image: linear-gradient(
+            90deg,
+            rgba(140, 140, 140, 0),
+            #9a9a9a 15%,
+            #9a9a9a 85%,
+            rgba(140, 140, 140, 0)
+        );
+    }
+
+    /*
+       Nombre en cursiva: relleno celeste con borde azul petróleo y una
+       sombra suave, como en el diseño de referencia.
+    */
+    .nf-nombre {
+        font-family: "Great Vibes", cursive;
+        font-weight: 400;
+        font-size: min(13.5vw, 3.7rem);
+        line-height: 1.2;
+        word-spacing: 0.18em;
+        color: #2a8fb0;
+        background-image: linear-gradient(180deg, #5fc0da 0%, #1f7f9f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -webkit-text-stroke: 1px #0e5670;
+        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+        padding: 0 10px;
+    }
+
+    .nf-apellidos {
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: min(7.2vw, 2rem);
+        line-height: 1.1;
+        color: #1f86a8;
+        text-transform: uppercase;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        margin-top: 8px;
+    }
+
+    .nf-carrera {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 26px;
+        font-family: "Cinzel", serif;
+        font-size: min(4.4vw, 1.2rem);
+        line-height: 1.3;
+        color: #8c8c8c;
+        text-transform: uppercase;
+    }
+
+    .nf-carrera-fuerte {
+        font-size: min(5.6vw, 1.5rem);
+        font-weight: 600;
+        color: #7d7d7d;
+    }
+</style>
+
+<script>
+    import { gsap } from "gsap";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const seccion = document.getElementById("sobre-novios");
+        if (!seccion) return;
+
+        const menosMovimiento = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+        ).matches;
+        if (menosMovimiento) return;
+
+        const piezas = seccion.querySelectorAll(
+            ".nf-titulo, .nf-linea, .nf-nombre, .nf-apellidos, .nf-carrera",
+        );
+        gsap.set(".nf-birrete", { opacity: 0, y: -60, rotate: -20 });
+        gsap.set(piezas, { opacity: 0, y: 20 });
+
+        function arrancar() {
+            const tl = gsap.timeline();
+            tl.to(".nf-birrete", {
+                opacity: 1,
+                y: 0,
+                rotate: -6,
+                duration: 1.1,
+                ease: "back.out(1.6)",
+            })
+                .to(
+                    piezas,
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.9,
+                        stagger: 0.25,
+                        ease: "power2.out",
+                    },
+                    "-=0.4",
+                );
+        }
+
+        // Si la portada vuelve, se anima recién al abrirla
+        const portada = document.getElementById("portada-section");
+        if ((window as any).portadaAbierta || !portada) {
+            arrancar();
+        } else {
+            window.addEventListener("portada-abierta", arrancar, { once: true });
+        }
+    });
+</script>

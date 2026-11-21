@@ -1,0 +1,725 @@
+---
+// src/components/Portada.astro - Portada de graduación: fondo celeste
+// clarito, los sombreros arriba, "Mi Graduación" con el nombre del
+// egresado, el sobre azul lacrado con el sello del birrete al centro y
+// "Toca el Sobre" abajo, todo dentro de un marco fino con esquinas.
+// Detrás del sobre solo hay un aura de luz suave, sin partículas ni flores.
+// El sobre entero es el botón. Al tocarlo tiembla, el sello se enciende,
+// estalla una lluvia de chispas y la portada se va en un resplandor.
+// La melodía arranca en ese toque (ver abrirTodo, en el script): es el
+// único momento en que el navegador deja sonar un audio, porque hace falta
+// un gesto de la persona. Desde ahí la maneja BotonMusica.astro.
+//
+// Imágenes: /imagenes/sombreros.webp (arriba) y /imagenes/sobre.webp (el
+// sobre con el sello, 800x514).
+//
+// ── DATOS EDITABLES (salen de información.txt) ────────────────
+const titulo = "Mi Graduación";
+const invita = "Te invito a celebrar conmigo";
+const nombre = "Caleb Cristian";
+const carrera = "Bioquímica y Farmacia";
+const llamada = "Toca el Sobre";
+// ──────────────────────────────────────────────────────────────
+
+---
+
+<!-- CAPA BLANCA DE TRANSICIÓN — tapa el fondo del layout durante el fade -->
+<div
+    id="capa-blanca"
+    style="
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(#ffffff, #ffffff);
+    z-index: 8499;
+    opacity: 1;
+    pointer-events: none;
+"
+>
+</div>
+
+<!--
+   La portada va por debajo del botón flotante de música (z 9000) para que
+   el control siga accesible mientras la portada se desvanece.
+-->
+<section
+    class="fixed inset-0 w-full flex justify-center z-[8500]"
+    id="portada-section"
+>
+    <!-- Columna de celular: en tablet / PC no se estira de costado -->
+    <div class="marco" id="marco-portada">
+        <!-- Aura de luz detrás del sobre -->
+        <div class="aura" id="aura" aria-hidden="true"></div>
+
+        <!--
+           Marco fino: doble filete y una esquina elegante (la misma pieza
+           girada) en cada vértice.
+        -->
+        <div class="filete" aria-hidden="true">
+            <svg width="0" height="0" class="defs-marco">
+                <defs>
+                    <linearGradient id="po-hilo" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#5fc0da"></stop>
+                        <stop offset="1" stop-color="#135b84"></stop>
+                    </linearGradient>
+                    <linearGradient id="po-dorado" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#f6e3a1"></stop>
+                        <stop offset="1" stop-color="#b8903a"></stop>
+                    </linearGradient>
+                    <symbol id="po-esq" viewBox="0 0 90 90">
+                        <g fill="none" stroke="url(#po-hilo)" stroke-width="1.6" stroke-linecap="round">
+                            <path d="M3 70 V16 Q3 3 16 3 H70"></path>
+                            <path d="M11 58 V24 Q11 11 24 11 H58"></path>
+                            <path d="M70 3 q9 0 12 6 q3 7 -4 9 q-6 1 -7 -4"></path>
+                            <path d="M3 70 q0 9 6 12 q7 3 9 -4 q1 -6 -4 -7"></path>
+                        </g>
+                        <path d="M22 22 l6 -6 l6 6 l-6 6 z" fill="url(#po-dorado)"></path>
+                        <circle cx="44" cy="3" r="1.8" fill="url(#po-dorado)"></circle>
+                        <circle cx="3" cy="44" r="1.8" fill="url(#po-dorado)"></circle>
+                    </symbol>
+                </defs>
+            </svg>
+            <svg class="esq e-si"><use href="#po-esq"></use></svg>
+            <svg class="esq e-sd"><use href="#po-esq"></use></svg>
+            <svg class="esq e-ii"><use href="#po-esq"></use></svg>
+            <svg class="esq e-id"><use href="#po-esq"></use></svg>
+        </div>
+
+        <!-- Contenido: sombreros, nombre, sobre y llamada -->
+        <div class="contenido">
+            <img
+                class="sombreros"
+                src="/imagenes/sombreros.webp"
+                width="900"
+                height="346"
+                alt=""
+                aria-hidden="true"
+            />
+
+            <div class="nombre-caja" id="nombre-caja">
+                <p class="p-invita">{invita}</p>
+                <h1 class="p-titulo">{titulo}</h1>
+                <span class="p-linea" aria-hidden="true"></span>
+                <p class="p-nombre">{nombre}</p>
+                <p class="p-carrera">
+                    <span class="p-fil" aria-hidden="true"></span>
+                    <span>{carrera}</span>
+                    <span class="p-fil" aria-hidden="true"></span>
+                </p>
+            </div>
+
+            <button
+                id="btn-sobre"
+                type="button"
+                aria-label="Abrir la invitación"
+                class="sobre-boton"
+            >
+                <span class="sobre-flota" id="sobre-flota">
+                    <img
+                        class="sobre"
+                        src="/imagenes/sobre.webp"
+                        width="800"
+                        height="514"
+                        alt=""
+                        aria-hidden="true"
+                        fetchpriority="high"
+                    />
+                    <!-- Resplandor del sello -->
+                    <span class="lacre-luz" id="lacre-luz"></span>
+                </span>
+            </button>
+
+            <p id="llamada-portada" class="llamada">
+                <span class="ll-fil" aria-hidden="true"></span>
+                <span class="ll-texto">{llamada}</span>
+                <span class="ll-fil" aria-hidden="true"></span>
+            </p>
+        </div>
+
+        <!-- Resplandor final al abrir -->
+        <div class="resplandor" id="resplandor" aria-hidden="true"></div>
+    </div>
+</section>
+
+<style>
+    body.portada-activa {
+        overflow: hidden !important;
+        height: 100vh !important;
+    }
+
+    /*
+       Fondos declarados como degradados y no como colores: el modo oscuro
+       forzado oscurece colores pero respeta las imágenes.
+       Todo se mide en cqw (% del ancho de la columna).
+    */
+    .marco {
+        container-type: inline-size;
+        position: relative;
+        width: 100%;
+        max-width: 430px;
+        height: 100%;
+        overflow: hidden;
+        background-image: linear-gradient(
+            180deg,
+            #dcedf4 0%,
+            #f2f9fc 42%,
+            #e2f0f6 100%
+        );
+    }
+
+    .aura {
+        position: absolute;
+        left: 50%;
+        top: 56%;
+        width: 120cqw;
+        height: 120cqw;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        pointer-events: none;
+        background-image: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(190, 228, 244, 0.55) 40%,
+            rgba(190, 228, 244, 0) 70%
+        );
+        animation: auraLatido 5s ease-in-out infinite;
+    }
+
+    @keyframes auraLatido {
+        0%,
+        100% {
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0.85;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.08);
+            opacity: 1;
+        }
+    }
+
+    .filete {
+        position: absolute;
+        inset: 3.4cqw;
+        border: 1px solid rgba(42, 134, 166, 0.5);
+        pointer-events: none;
+        box-shadow:
+            inset 0 0 0 3px rgba(255, 255, 255, 0.55),
+            inset 0 0 0 4px rgba(42, 134, 166, 0.28);
+    }
+
+    .defs-marco {
+        position: absolute;
+    }
+
+    /* La esquina se dibuja en el vértice y se gira para las otras tres */
+    .esq {
+        position: absolute;
+        width: 17cqw;
+        height: 17cqw;
+    }
+    .e-si {
+        left: -1px;
+        top: -1px;
+    }
+    .e-sd {
+        right: -1px;
+        top: -1px;
+        transform: scaleX(-1);
+    }
+    .e-ii {
+        left: -1px;
+        bottom: -1px;
+        transform: scaleY(-1);
+    }
+    .e-id {
+        right: -1px;
+        bottom: -1px;
+        transform: scale(-1, -1);
+    }
+
+    /* Contenido: se reparte de arriba a abajo */
+    .contenido {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        padding: 8cqw 6cqw 10cqw;
+    }
+
+    .sombreros {
+        display: block;
+        width: 68%;
+        height: auto;
+        opacity: 0.55;
+    }
+
+    .nombre-caja {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .p-titulo {
+        margin: 0;
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: min(9.4cqw, 4.6vh);
+        line-height: 1.1;
+        color: #8c8c8c;
+        text-shadow: 0 2px 3px rgba(0, 0, 0, 0.18);
+    }
+
+    .p-linea {
+        display: block;
+        width: 78%;
+        height: 1px;
+        margin: 4cqw 0 4.4cqw;
+        background-image: linear-gradient(
+            90deg,
+            rgba(140, 140, 140, 0),
+            #9a9a9a 15%,
+            #9a9a9a 85%,
+            rgba(140, 140, 140, 0)
+        );
+    }
+
+    .p-nombre {
+        margin: 0;
+        font-family: "Great Vibes", cursive;
+        font-size: min(15cqw, 7.4vh);
+        line-height: 1.3;
+        word-spacing: 0.15em;
+        color: #2a8fb0;
+        background-image: linear-gradient(180deg, #5fc0da 0%, #1f7f9f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -webkit-text-stroke: 1px #0e5670;
+        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+    }
+
+    /* El sobre es el botón */
+    .sobre-boton {
+        position: relative;
+        display: block;
+        width: 72cqw;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .sobre-flota {
+        position: relative;
+        display: block;
+        width: 100%;
+        will-change: transform;
+    }
+
+    .sobre {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 2.4cqw;
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.55),
+            0 10px 18px rgba(10, 70, 100, 0.38),
+            0 2px 4px rgba(10, 70, 100, 0.3);
+    }
+
+    /* Resplandor del sello: justo donde está el sello dibujado */
+    .lacre-luz {
+        position: absolute;
+        left: 49.8%;
+        top: 63.6%;
+        width: 24%;
+        aspect-ratio: 1;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        pointer-events: none;
+        background-image: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(255, 244, 200, 0.6) 40%,
+            rgba(255, 244, 200, 0) 70%
+        );
+        animation: lacrePulso 2.4s ease-in-out infinite;
+    }
+
+    @keyframes lacrePulso {
+        0%,
+        100% {
+            opacity: 0.25;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+        50% {
+            opacity: 0.8;
+            transform: translate(-50%, -50%) scale(1.25);
+        }
+    }
+
+    .llamada {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3cqw;
+        margin: 0;
+        font-family: "Great Vibes", cursive;
+        font-size: min(9cqw, 4.6vh);
+        line-height: 1.1;
+        color: #2a86a6;
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.95);
+    }
+
+    .ll-texto {
+        display: inline-block;
+        animation: llamadaLatido 2.2s ease-in-out infinite;
+    }
+
+    /* Rayitas a los lados de la llamada, con un rombo en la punta */
+    .ll-fil {
+        position: relative;
+        display: block;
+        width: 11cqw;
+        height: 1px;
+        background-image: linear-gradient(90deg, rgba(42, 134, 166, 0), #2a86a6);
+    }
+    .ll-fil:last-child {
+        transform: scaleX(-1);
+    }
+    .ll-fil::after {
+        content: "";
+        position: absolute;
+        right: -1px;
+        top: -2px;
+        width: 5px;
+        height: 5px;
+        transform: rotate(45deg);
+        background-image: linear-gradient(#2a86a6, #2a86a6);
+    }
+
+    @keyframes llamadaLatido {
+        0%,
+        100% {
+            transform: scale(1);
+            opacity: 0.85;
+        }
+        50% {
+            transform: scale(1.06);
+            opacity: 1;
+        }
+    }
+
+    /* Frase de invitación arriba del título */
+    .p-invita {
+        margin: 0 0 4.4cqw;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-weight: 600;
+        font-size: min(4.4cqw, 2.3vh);
+        letter-spacing: 0.04em;
+        color: #6f7c85;
+    }
+
+    /* Rombo en el centro de la línea bajo el título */
+    .p-linea {
+        position: relative;
+    }
+    .p-linea::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 7px;
+        height: 7px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background-image: linear-gradient(135deg, #f6e3a1, #c9a24a);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+    }
+
+    /* Carrera entre dos filetes */
+    .p-carrera {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2.6cqw;
+        margin: 5cqw 0 0;
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: min(3.7cqw, 1.9vh);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #7d7d7d;
+    }
+    .p-fil {
+        display: block;
+        width: 9cqw;
+        height: 1px;
+        background-image: linear-gradient(90deg, rgba(125, 125, 125, 0), #8c8c8c);
+    }
+    .p-fil:last-child {
+        transform: scaleX(-1);
+    }
+
+    /* Resplandor que llena la pantalla al abrir */
+    .resplandor {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        background-image: radial-gradient(
+            circle at 50% 58%,
+            #ffffff 0%,
+            rgba(255, 255, 255, 0.95) 45%,
+            rgba(235, 247, 252, 0.9) 100%
+        );
+    }
+
+    /* Chispas del estallido (las crea el script al tocar) */
+    .marco :global(.estallido) {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .aura,
+        .lacre-luz,
+        .ll-texto {
+            animation: none;
+        }
+    }
+</style>
+
+<script>
+    import { gsap } from "gsap";
+
+    if (typeof window !== "undefined") {
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add("portada-activa");
+
+            const boton = document.getElementById("btn-sobre");
+            const flota = document.getElementById("sobre-flota");
+            const nombre = document.getElementById("nombre-caja");
+            const llamada = document.getElementById("llamada-portada");
+            const lacreLuz = document.getElementById("lacre-luz");
+            const aura = document.getElementById("aura");
+            const marco = document.getElementById("marco-portada");
+            const resplandor = document.getElementById("resplandor");
+            const seccion = document.getElementById("portada-section");
+            const capaBlanca = document.getElementById("capa-blanca");
+            if (!boton || !flota || !marco) return;
+
+            const menosMovimiento = window.matchMedia(
+                "(prefers-reduced-motion: reduce)",
+            ).matches;
+
+            let abriendo = false;
+
+            // ── Estado inicial ──────────────────────────────────────
+            gsap.set(nombre, { opacity: 0, y: -24, scale: 0.92 });
+            gsap.set(flota, { opacity: 0, y: 40, scale: 0.85 });
+            gsap.set(llamada, { opacity: 0, y: 12 });
+
+            // ── Entrada ─────────────────────────────────────────────
+            const tl = gsap.timeline({ delay: 0.3 });
+            tl.to(nombre, {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 1.2,
+                ease: "power3.out",
+            })
+                .to(
+                    flota,
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 1.2,
+                        ease: "back.out(1.4)",
+                    },
+                    0.45,
+                )
+                .to(
+                    llamada,
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        ease: "power2.out",
+                    },
+                    1.2,
+                );
+
+            // ── El sobre flota apenas ───────────────────────────────
+            if (!menosMovimiento) {
+                tl.add(() => {
+                    if (abriendo) return;
+                    gsap.to(flota, {
+                        y: -8,
+                        rotate: 0.6,
+                        duration: 2.6,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut",
+                    });
+                });
+            }
+
+            // ── Suelta el scroll y deja la invitación arrancada en la
+            //    primera sección (NombresFlores).
+            const abrirInvitacion = () => {
+                document.body.classList.remove("portada-activa");
+                document.body.style.overflow = "auto";
+
+                const destino = document.getElementById("sobre-novios");
+                if (destino) {
+                    destino.scrollIntoView({ block: "start", behavior: "instant" });
+                } else {
+                    window.scrollTo({ top: 0 });
+                }
+
+                // Aviso para que las secciones recién ahora arranquen
+                // su entrada (si no, se dispararían tapadas por la portada)
+                (window as any).portadaAbierta = true;
+                window.dispatchEvent(new Event("portada-abierta"));
+            };
+
+            /*
+               Lluvia de chispas que sale del sello. Se crean acá y no en
+               el servidor porque viven medio segundo y solo al tocar.
+            */
+            const estallar = () => {
+                if (menosMovimiento) return;
+                const caja = marco.getBoundingClientRect();
+                const s = flota.getBoundingClientRect();
+                const cx = s.left + s.width / 2 - caja.left;
+                const cy = s.top + s.height * 0.636 - caja.top;
+                const colores = [
+                    "255,236,180",
+                    "120,196,226",
+                    "255,255,255",
+                    "240,199,90",
+                ];
+                for (let i = 0; i < 34; i++) {
+                    const p = document.createElement("span");
+                    const tam = 3 + Math.random() * 5;
+                    const c = colores[i % colores.length];
+                    p.className = "estallido";
+                    p.style.cssText = `left:${cx}px;top:${cy}px;width:${tam}px;height:${tam}px;margin:-${tam / 2}px 0 0 -${tam / 2}px;background:radial-gradient(circle,rgba(${c},1) 0%,rgba(${c},0) 70%);box-shadow:0 0 8px rgba(${c},.9);`;
+                    marco.appendChild(p);
+                    const ang = (Math.PI * 2 * i) / 34 + Math.random() * 0.3;
+                    const dist = 80 + Math.random() * 150;
+                    gsap.to(p, {
+                        x: Math.cos(ang) * dist,
+                        y: Math.sin(ang) * dist,
+                        opacity: 0,
+                        scale: 0.3,
+                        duration: 0.9 + Math.random() * 0.6,
+                        ease: "power3.out",
+                        onComplete: () => p.remove(),
+                    });
+                }
+            };
+
+            // ── Abrir la invitación ─────────────────────────────────
+            const abrirTodo = () => {
+                if (abriendo) return;
+                abriendo = true;
+
+                gsap.killTweensOf(flota);
+
+                /*
+                   Acá arranca la música, y tiene que ser acá: los
+                   navegadores solo dejan sonar un audio si lo pide un
+                   gesto de la persona. Queda en window.audioGlobal para
+                   que el botón de la esquina maneje esta misma melodía.
+                */
+                const yaExiste = (window as any).audioGlobal as
+                    | HTMLAudioElement
+                    | undefined;
+                const melodia = yaExiste ?? new Audio("/musica/melodia2.mp3");
+                melodia.loop = true;
+                melodia.volume = 0.65;
+                (window as any).audioGlobal = melodia;
+                melodia.play().catch(() => {});
+
+                /*
+                   Directo a NombresFlores: la invitación ya queda
+                   posicionada ahí desde el primer instante (abrirInvitacion
+                   suelta el scroll y la deja en esa sección, que va tapada
+                   por la portada), y la portada solo se desvanece encima.
+                   Un toque corto del sobre y un fundido rápido, sin
+                   esperas.
+                */
+                gsap.set([lacreLuz, aura], { animation: "none" });
+                abrirInvitacion();
+
+                gsap.timeline()
+                    // El sobre se hunde como si lo apretaran
+                    .to(flota, {
+                        scale: 0.94,
+                        rotate: 0,
+                        y: 0,
+                        duration: 0.12,
+                        ease: "power2.in",
+                    })
+                    // El sello se enciende y estallan las chispas
+                    .to(lacreLuz, { opacity: 1, scale: 2, duration: 0.3 }, 0.05)
+                    .add(estallar, 0.1)
+                    .to(llamada, { opacity: 0, duration: 0.2 }, 0)
+                    // Todo se desvanece y deja ver NombresFlores
+                    .to(
+                        seccion,
+                        {
+                            opacity: 0,
+                            duration: 0.5,
+                            ease: "power2.inOut",
+                            onComplete: () => {
+                                seccion?.remove();
+                                capaBlanca?.remove();
+                            },
+                        },
+                        0.25,
+                    );
+            };
+
+            boton.addEventListener("click", abrirTodo);
+
+            /*
+               En PC el sobre acompaña un poco al mouse; en celular, la
+               inclinación del aparato. Pocos grados: alcanza para que
+               parezca que flota delante del fondo.
+            */
+            if (!menosMovimiento && seccion) {
+                const mover = (gx: number, gy: number) => {
+                    if (abriendo) return;
+                    gsap.to(boton, {
+                        x: gx,
+                        y: gy,
+                        duration: 0.8,
+                        ease: "power2.out",
+                        overwrite: "auto",
+                    });
+                };
+                seccion.addEventListener("mousemove", (e) => {
+                    const mx = e.clientX / window.innerWidth - 0.5;
+                    const my = e.clientY / window.innerHeight - 0.5;
+                    mover(mx * 14, my * 10);
+                });
+                seccion.addEventListener("mouseleave", () => mover(0, 0));
+                window.addEventListener("deviceorientation", (e) => {
+                    if (e.gamma === null || e.beta === null) return;
+                    const gx = Math.max(-8, Math.min(8, e.gamma / 4));
+                    const gy = Math.max(-6, Math.min(6, (e.beta - 45) / 6));
+                    mover(gx, gy);
+                });
+            }
+        });
+    }
+</script>

@@ -1,0 +1,205 @@
+---
+// src/components/Confirmar.astro
+// Va debajo de SeparaFecha: el calendario, el botón "Confirmar Asistencia",
+// la frase de cierre y las flores de las dos esquinas de abajo.
+//
+// Imágenes: /imagenes/calendario.webp y /imagenes/flores.webp.
+//
+// ── DATOS EDITABLES ───────────────────────────────────────────
+// WhatsApp donde llegan las confirmaciones: con código de país y sin el
+// "+" (ej. 59170000000). Todavía no está en información.txt.
+const telefono = "";
+const nombreEgresado = "Caleb";
+const mensaje = `Hola, confirmo mi asistencia a la graduación de ${nombreEgresado}.`;
+const frase = "¡Tu presencia hará de este día un momento inolvidable!";
+// ──────────────────────────────────────────────────────────────
+
+const enlace = telefono
+    ? `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`
+    : "#";
+
+---
+
+<section id="confirmar" class="cf-seccion">
+    <!-- El calendario con un halo de luz detrás -->
+    <div class="cf-icono" data-anim="zoom">
+        <img class="cf-calendario" src="/imagenes/calendario.webp" width="360" height="376" alt="" decoding="async" />
+    </div>
+
+    <a class="cf-boton" id="cf-boton" data-anim="izq" data-delay="0.15" href={enlace} target="_blank" rel="noopener">
+        <span>Confirmar</span>
+        <span>Asistencia</span>
+    </a>
+
+    <span class="cf-adorno" aria-hidden="true" data-anim="linea" data-delay="0.3"></span>
+
+    <p class="cf-frase" data-anim="der" data-delay="0.35">{frase}</p>
+
+    <!-- Flores: la misma imagen, espejada a la derecha -->
+    <img class="cf-flores cf-izq" data-anim="izq" data-delay="0.2" src="/imagenes/flores.webp" width="760" height="651" alt="" decoding="async" />
+    <img class="cf-flores cf-der" data-anim="der" data-delay="0.2" src="/imagenes/flores.webp" width="760" height="651" alt="" decoding="async" />
+</section>
+
+<style>
+    /*
+       Fondo declarado como degradado y no como color (modo oscuro
+       forzado): celeste muy suave arriba que se aclara hacia abajo.
+       Todo se mide en cqw (% del ancho de la sección).
+    */
+    .cf-seccion {
+        container-type: inline-size;
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* Más aire arriba: separa esta sección de la anterior */
+        padding: 14cqw 8cqw 46cqw;
+        background-image: linear-gradient(180deg, #f4fbfd 0%, #ffffff 70%);
+    }
+
+    .cf-icono {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        width: 30cqw;
+    }
+    .cf-icono::before {
+        content: "";
+        position: absolute;
+        inset: -6cqw;
+        border-radius: 50%;
+        background-image: radial-gradient(
+            circle,
+            rgba(190, 228, 244, 0.85) 0%,
+            rgba(190, 228, 244, 0) 68%
+        );
+    }
+
+    .cf-calendario {
+        position: relative;
+        width: 19cqw;
+        height: auto;
+        filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.22));
+    }
+
+    /* Botón celeste con brillo */
+    .cf-boton {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        margin-top: 6cqw;
+        padding: 3.4cqw 9cqw;
+        border-radius: 5cqw;
+        font-family: "Great Vibes", cursive;
+        font-size: 7.6cqw;
+        line-height: 1.05;
+        color: #2c7fa6;
+        text-decoration: none;
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.95);
+        background-image: linear-gradient(
+            180deg,
+            #d4edf8 0%,
+            #9fd3ea 55%,
+            #7fc0de 100%
+        );
+        box-shadow:
+            inset 0 2px 3px rgba(255, 255, 255, 0.9),
+            0 0 0 1px #8dc6e0,
+            0 4px 8px rgba(40, 110, 150, 0.4);
+    }
+
+    /* Reflejo que cruza el botón cada tanto */
+    .cf-boton::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -60%;
+        width: 40%;
+        transform: skewX(-20deg);
+        background-image: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0)
+        );
+        animation: cfBrillo 4.2s ease-in-out infinite;
+    }
+
+    @keyframes cfBrillo {
+        0%,
+        55% {
+            left: -60%;
+        }
+        100% {
+            left: 130%;
+        }
+    }
+
+    /* Línea fina con rombo dorado entre el botón y la frase */
+    .cf-adorno {
+        position: relative;
+        display: block;
+        width: 46cqw;
+        height: 1px;
+        margin-top: 7cqw;
+        background-image: linear-gradient(
+            90deg,
+            rgba(42, 134, 166, 0),
+            #2a86a6 25%,
+            #2a86a6 75%,
+            rgba(42, 134, 166, 0)
+        );
+    }
+    .cf-adorno::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 6px;
+        height: 6px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background-image: linear-gradient(135deg, #f6e3a1, #c9a24a);
+        box-shadow: 0 0 0 2px #fbfeff;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .cf-boton::after {
+            animation: none;
+            display: none;
+        }
+    }
+
+    .cf-frase {
+        margin: 5cqw 0 0;
+        max-width: 66cqw;
+        text-align: center;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-weight: 700;
+        font-size: 4.6cqw;
+        line-height: 1.3;
+        color: #6f7c85;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    }
+
+    .cf-flores {
+        position: absolute;
+        bottom: 0;
+        width: 42cqw;
+        height: auto;
+    }
+
+    .cf-izq {
+        left: 1cqw;
+    }
+
+    .cf-der {
+        right: 1cqw;
+        transform: scaleX(-1);
+    }
+</style>

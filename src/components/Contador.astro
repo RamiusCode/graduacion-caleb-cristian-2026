@@ -1,0 +1,211 @@
+---
+// src/components/Contador.astro
+// Va debajo de Foto1: "Faltan:", la cuenta regresiva y, abajo, el marco
+// con el egresado y las flores con la frase adentro.
+//
+// Archivo: /imagenes/marco-contador.webp (1200x400, ~117 KB). El original
+// (imagen2.png, 1.8 MB) queda de respaldo, no se usa.
+//
+// ── DATOS EDITABLES (salen de información.txt) ────────────────
+// Sábado 19 de diciembre de 2026, 19:00 (mes 12)
+const anio = 2026;
+const mes = 12;
+const dia = 19;
+const hora = "19:00";
+// Hora de Bolivia (UTC-4): la cuenta marca lo mismo en cualquier celular,
+// esté donde esté el invitado.
+const zona = "-04:00";
+const textoFaltan = "Faltan:";
+const frase = "Hoy culmina una etapa importante, y deseo festejarlo contigo";
+// ──────────────────────────────────────────────────────────────
+
+const dos = (n: number) => String(n).padStart(2, "0");
+const fechaIso = `${anio}-${dos(mes)}-${dos(dia)}T${hora}:00${zona}`;
+
+const unidades = [
+    { u: "d", rotulo: "Días", inicial: "0" },
+    { u: "h", rotulo: "Horas", inicial: "00" },
+    { u: "m", rotulo: "Minutos", inicial: "00" },
+    { u: "s", rotulo: "Segundos", inicial: "00" },
+];
+---
+
+<section id="contador" class="ct-seccion">
+    <h2 class="ct-faltan" data-anim="izq">{textoFaltan}</h2>
+
+    <div class="ct-cuenta" id="ct-cuenta" data-fecha={fechaIso}>
+        {
+            unidades.map((x, i) => (
+                <>
+                    {i > 0 && (
+                        <span class="ct-dos" aria-hidden="true">
+                            :
+                        </span>
+                    )}
+                    <div class="ct-celda" data-anim="abajo" data-delay={i * 0.12}>
+                        <span class="ct-num" data-u={x.u}>
+                            {x.inicial}
+                        </span>
+                        <span class="ct-rotulo">{x.rotulo}</span>
+                    </div>
+                </>
+            ))
+        }
+    </div>
+
+    <div class="ct-marco" id="ct-marco" data-anim="zoom">
+        <img
+            class="ct-img"
+            src="/imagenes/marco-contador.webp"
+            width="1200"
+            height="400"
+            alt=""
+            decoding="async"
+        />
+        <p class="ct-frase">{frase}</p>
+    </div>
+</section>
+
+<style>
+    /*
+       Fondo declarado como degradado y no como color (modo oscuro
+       forzado). Blanco, igual que donde termina Foto1.
+       Todo se mide en cqw (% del ancho de la sección): las proporciones
+       se mantienen en cualquier celular.
+    */
+    .ct-seccion {
+        container-type: inline-size;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 3cqw 2cqw;
+        background-image: linear-gradient(#ffffff, #ffffff);
+    }
+
+    .ct-faltan {
+        font-family: "Great Vibes", cursive;
+        font-weight: 400;
+        font-size: 13cqw;
+        line-height: 1.1;
+        color: #2a86a6;
+        text-shadow: 0 2px 3px rgba(0, 0, 0, 0.18);
+        margin: 0;
+    }
+
+    .ct-cuenta {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 2.4cqw;
+        margin-top: 2cqw;
+    }
+
+    .ct-celda {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 17cqw;
+    }
+
+    .ct-num {
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 11cqw;
+        line-height: 1;
+        color: #1f7b97;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .ct-dos {
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 11cqw;
+        line-height: 1;
+        color: #1f7b97;
+    }
+
+    .ct-rotulo {
+        margin-top: 1.6cqw;
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 2.6cqw;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #2a86a6;
+    }
+
+    /* El marco: la imagen manda, la frase se acomoda sobre la tarjeta */
+    .ct-marco {
+        position: relative;
+        width: 100%;
+        margin-top: 7cqw;
+    }
+
+    /*
+       Estirada un poco a lo alto (de 1200x400 a 1200x470, ~17%) para que
+       la frase entre cómoda en la tarjeta.
+    */
+    .ct-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1200 / 470;
+        object-fit: fill;
+    }
+
+    /*
+       La tarjeta crema ocupa, dentro de la imagen, del 28% al 92% de
+       ancho y del 52% al 88% de alto (las flores tapan la parte de
+       arriba). La frase se centra en ese espacio.
+    */
+    .ct-frase {
+        position: absolute;
+        left: 30%;
+        width: 60%;
+        top: 53%;
+        height: 35%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin: 0;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-weight: 600;
+        font-size: 4.3cqw;
+        line-height: 1.25;
+        color: #1f5f78;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // ── Cuenta regresiva ────────────────────────────────────
+        const cuenta = document.getElementById("ct-cuenta");
+        if (cuenta) {
+            const destino = new Date(cuenta.dataset.fecha ?? "").getTime();
+            const casilla = (u: string) =>
+                cuenta.querySelector<HTMLElement>(`[data-u="${u}"]`);
+            const d = casilla("d");
+            const h = casilla("h");
+            const m = casilla("m");
+            const s = casilla("s");
+            const dos = (n: number) => String(n).padStart(2, "0");
+
+            const pintar = () => {
+                const resto = Math.max(0, destino - Date.now());
+                const seg = Math.floor(resto / 1000);
+                if (d) d.textContent = String(Math.floor(seg / 86400));
+                if (h) h.textContent = dos(Math.floor((seg % 86400) / 3600));
+                if (m) m.textContent = dos(Math.floor((seg % 3600) / 60));
+                if (s) s.textContent = dos(seg % 60);
+                // Ya llegó el día: todo en cero, y no hace falta seguir
+                if (resto === 0) clearInterval(reloj);
+            };
+            const reloj = setInterval(pintar, 1000);
+            pintar();
+        }
+    });
+</script>

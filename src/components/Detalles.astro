@@ -1,0 +1,439 @@
+---
+// src/components/Detalles.astro
+// Va debajo de Contador: los sombreros, "Detalles del Evento",
+// "Celebración" y una tarjeta con lo más importante de la invitación: la
+// fecha y la hora en grande, y debajo el lugar con el botón de ubicación.
+//
+// Imágenes: /imagenes/sombreros.webp (arriba), /imagenes/copas.webp y
+// /imagenes/diploma.webp (la copa y el pergamino).
+//
+// ── DATOS EDITABLES (salen de información.txt) ────────────────
+const titulo = "Detalles del Evento";
+const subtitulo = "Celebración";
+const diaSemana = "Sábado";
+const dia = "19";
+const mes = "de Diciembre";
+const hora = "19:00 p.m.";
+const lugar = "Salón de Eventos Fetejjar";
+// Enlace de Google Maps del salón (lo pasó el cliente)
+const enlaceUbicacion = "https://maps.app.goo.gl/dcVDmbmDQSG6nu4z8";
+// ──────────────────────────────────────────────────────────────
+---
+
+<section id="detalles" class="dt-seccion">
+    <img
+        class="dt-sombreros"
+        data-anim="arriba"
+        src="/imagenes/sombreros.webp"
+        width="900"
+        height="346"
+        alt=""
+        decoding="async"
+    />
+
+    <h2 class="dt-titulo" data-anim="izq">{titulo}</h2>
+    <span
+        class="dt-linea"
+        aria-hidden="true"
+        data-anim="linea"
+        data-delay="0.2"></span>
+    <p class="dt-sub" data-anim="der" data-delay="0.1">
+        <span class="dt-fil" aria-hidden="true"></span>
+        <span>{subtitulo}</span>
+        <span class="dt-fil" aria-hidden="true"></span>
+    </p>
+
+    <div class="dt-tarjeta" id="dt-tarjeta" data-anim="abajo">
+        <!-- Lo más importante: la fecha y la hora, bien grandes -->
+        <div class="dt-fecha" data-anim="zoom" data-delay="0.25">
+            <p class="dt-dia-sem">{diaSemana}</p>
+            <p class="dt-fecha-grande">
+                <span class="dt-num">{dia}</span>
+                <span class="dt-mes">{mes}</span>
+            </p>
+            <p class="dt-hora-grande">
+                <span class="dt-fil" aria-hidden="true"></span>
+                <span>{hora}</span>
+                <span class="dt-fil" aria-hidden="true"></span>
+            </p>
+        </div>
+
+        <span class="dt-sep" aria-hidden="true"></span>
+
+        <!-- El lugar, entre las copas y el pergamino -->
+        <div class="dt-lugar-fila">
+            <img
+                class="dt-copas"
+                data-anim="izq"
+                data-delay="0.35"
+                src="/imagenes/copas.webp"
+                width="480"
+                height="492"
+                alt=""
+                decoding="async"
+            />
+
+            <div class="dt-datos" data-anim="abajo" data-delay="0.4">
+                <p class="dt-etiqueta">Lugar:</p>
+                <p class="dt-valor">{lugar}</p>
+            </div>
+
+            <img
+                class="dt-pergamino"
+                data-anim="der"
+                data-delay="0.35"
+                src="/imagenes/diploma.webp"
+                width="480"
+                height="488"
+                alt=""
+                decoding="async"
+            />
+        </div>
+
+        <a
+            class="dt-boton"
+            data-anim="abajo"
+            data-delay="0.5"
+            href={enlaceUbicacion}
+            target="_blank"
+            rel="noopener"
+        >
+            Ver ubicación
+        </a>
+    </div>
+</section>
+
+<style>
+    /*
+       Fondo declarado como degradado y no como color (modo oscuro
+       forzado): blanco arriba, celeste muy suave abajo. Todo se mide en
+       cqw (% del ancho de la sección).
+    */
+    .dt-seccion {
+        container-type: inline-size;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* Más aire arriba: separa esta sección de la anterior */
+        padding: 12cqw 5cqw 3cqw;
+        background-image: linear-gradient(180deg, #ffffff 0%, #eaf6fa 100%);
+    }
+
+    .dt-sombreros {
+        display: block;
+        width: 74%;
+        height: auto;
+        opacity: 0.55;
+    }
+
+    .dt-titulo {
+        font-family: "Great Vibes", cursive;
+        font-weight: 400;
+        font-size: 12.5cqw;
+        line-height: 1.15;
+        color: #2a86a6;
+        text-shadow:
+            0 2px 3px rgba(0, 0, 0, 0.2),
+            0 0 14px rgba(255, 255, 255, 0.9);
+        text-align: center;
+        margin: 5cqw 0 0;
+    }
+
+    /* Línea fina con un rombo dorado al centro */
+    .dt-linea {
+        position: relative;
+        display: block;
+        width: 70%;
+        height: 1px;
+        margin: 3cqw 0 4cqw;
+        background-image: linear-gradient(
+            90deg,
+            rgba(42, 134, 166, 0),
+            #2a86a6 20%,
+            #2a86a6 80%,
+            rgba(42, 134, 166, 0)
+        );
+    }
+    .dt-linea::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 7px;
+        height: 7px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background-image: linear-gradient(135deg, #f6e3a1, #c9a24a);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+    }
+
+    /* "Celebración" entre dos filetes */
+    .dt-sub {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3cqw;
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 4.6cqw;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #7d7d7d;
+        margin: 0 0 8cqw;
+    }
+    .dt-fil {
+        display: block;
+        width: 10cqw;
+        height: 1px;
+        background-image: linear-gradient(
+            90deg,
+            rgba(125, 125, 125, 0),
+            #8c8c8c
+        );
+    }
+    .dt-fil:last-child {
+        transform: scaleX(-1);
+    }
+
+    /* La tarjeta: una sola columna centrada */
+    .dt-tarjeta {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 9cqw 5cqw 8cqw;
+        border-radius: 6cqw;
+        background-image:
+            linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.7) 0%,
+                rgba(255, 255, 255, 0) 38%
+            ),
+            linear-gradient(
+                180deg,
+                rgba(206, 232, 242, 0.7),
+                rgba(220, 240, 247, 0.5)
+            );
+        box-shadow:
+            0 0 0 1px rgba(42, 134, 166, 0.22),
+            0 8px 18px rgba(30, 100, 140, 0.16);
+    }
+
+    /* Filete interior: da el aspecto de tarjeta enmarcada */
+    .dt-tarjeta::before {
+        content: "";
+        position: absolute;
+        inset: 2.2cqw;
+        border-radius: 4.2cqw;
+        border: 1px solid rgba(42, 134, 166, 0.28);
+        pointer-events: none;
+    }
+
+    /* Rombo dorado centrado en el borde de arriba */
+    .dt-tarjeta::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: -1.4cqw;
+        width: 2.8cqw;
+        height: 2.8cqw;
+        transform: translateX(-50%) rotate(45deg);
+        background-image: linear-gradient(135deg, #f6e3a1, #c9a24a);
+        box-shadow: 0 0 0 2px #eaf6fa;
+    }
+
+    /* ── Fecha y hora, lo más importante ── */
+    .dt-fecha {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .dt-dia-sem {
+        margin: 0;
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 8.4cqw;
+        letter-spacing: 0.3em;
+        text-indent: 0.3em;
+        text-transform: uppercase;
+        color: #6f7c85;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .dt-fecha-grande {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 1cqw 0 0;
+        font-family: "Great Vibes", cursive;
+        line-height: 1;
+        white-space: nowrap;
+        color: #1f7f9f;
+        background-image: linear-gradient(180deg, #4bb3d1 0%, #14698a 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -webkit-text-stroke: 0.8px #0e5670;
+        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.22))
+            drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+    }
+
+    /* El día, enorme; el mes, grande debajo */
+    .dt-num {
+        font-size: 30cqw;
+        line-height: 0.95;
+    }
+    .dt-mes {
+        font-size: 17cqw;
+        line-height: 1.1;
+    }
+
+    .dt-hora-grande {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3.4cqw;
+        margin: 2.4cqw 0 0;
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 9.4cqw;
+        line-height: 1.1;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #1f5f78;
+        text-shadow: 0 2px 3px rgba(0, 0, 0, 0.18);
+    }
+    .dt-hora-grande .dt-fil {
+        width: 9cqw;
+        background-image: linear-gradient(
+            90deg,
+            rgba(42, 134, 166, 0),
+            #2a86a6
+        );
+    }
+
+    /* Separador fino entre la fecha y el lugar */
+    .dt-sep {
+        display: block;
+        width: 60%;
+        height: 1px;
+        margin: 7cqw 0 6cqw;
+        background-image: linear-gradient(
+            90deg,
+            rgba(42, 134, 166, 0),
+            rgba(42, 134, 166, 0.6),
+            rgba(42, 134, 166, 0)
+        );
+    }
+
+    /* ── Lugar, entre las copas y el pergamino ── */
+    .dt-lugar-fila {
+        display: grid;
+        grid-template-columns: 20% 1fr 20%;
+        align-items: center;
+        column-gap: 2cqw;
+        width: 100%;
+    }
+
+    .dt-copas {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95))
+            drop-shadow(0 6px 6px rgba(30, 100, 140, 0.25));
+    }
+
+    .dt-pergamino {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 4px 5px rgba(30, 100, 140, 0.25));
+    }
+
+    .dt-datos {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .dt-etiqueta {
+        font-family: "Great Vibes", cursive;
+        font-size: 12.5cqw;
+        line-height: 1.1;
+        color: #2a86a6;
+        text-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+        margin: 0;
+    }
+
+    .dt-valor {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 700;
+        font-size: 6.8cqw;
+        line-height: 1.15;
+        color: #1f5f78;
+        margin: 1.4cqw 0 0;
+    }
+
+    /* Botón dorado "Ver ubicación" */
+    .dt-boton {
+        position: relative;
+        overflow: hidden;
+        margin-top: 7cqw;
+        padding: 3.2cqw 8cqw;
+        border-radius: 999px;
+        font-family: "Great Vibes", cursive;
+        font-size: 9cqw;
+        line-height: 1;
+        color: #6e4200;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(
+            180deg,
+            #fde7a0 0%,
+            #f0b73e 55%,
+            #d9982a 100%
+        );
+        box-shadow:
+            inset 0 1.5px 2px rgba(255, 255, 255, 0.85),
+            0 0 0 1px #e0a53a,
+            0 3px 6px rgba(120, 80, 0, 0.4);
+    }
+
+    /* Reflejo que cruza el botón cada tanto */
+    .dt-boton::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -60%;
+        width: 40%;
+        transform: skewX(-20deg);
+        background-image: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0.65),
+            rgba(255, 255, 255, 0)
+        );
+        animation: dtBrillo 4.2s ease-in-out infinite;
+    }
+
+    @keyframes dtBrillo {
+        0%,
+        55% {
+            left: -60%;
+        }
+        100% {
+            left: 130%;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .dt-boton::after {
+            animation: none;
+            display: none;
+        }
+    }
+</style>

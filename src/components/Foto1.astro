@@ -1,0 +1,44 @@
+---
+// src/components/Foto1.astro
+// Va justo debajo de NombresFlores: solo la imagen del sobre con la foto
+// del egresado, nada más.
+//
+// Archivo: /imagenes/sobrefoto.webp (800x887, ~76 KB). El original en PNG
+// (1 MB) queda de respaldo, no se usa.
+---
+
+<section id="foto-1" class="foto-seccion">
+    <img
+        class="foto-sobre"
+        data-anim="zoom"
+        data-ya
+        src="/imagenes/sobrefoto.webp"
+        width="800"
+        height="887"
+        alt="Caleb Cristian Cespedes Agreda, graduación"
+        decoding="async"
+    />
+</section>
+
+<style>
+    /*
+       Fondo declarado como degradado y no como color (modo oscuro
+       forzado). Arranca en el mismo tono con que termina NombresFlores,
+       así no se nota el corte entre las dos secciones.
+    */
+    .foto-seccion {
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        padding: 0 20px 8px;
+        background-image: linear-gradient(180deg, #f4f9fb 0%, #ffffff 100%);
+    }
+
+    .foto-sobre {
+        display: block;
+        width: 100%;
+        max-width: 380px;
+        height: auto;
+    }
+</style>

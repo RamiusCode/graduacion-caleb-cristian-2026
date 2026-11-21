@@ -1,0 +1,269 @@
+---
+// src/components/SeparaFecha.astro
+// Va debajo de Detalles: "Separa esta fecha!" a la izquierda y, a la
+// derecha, la tarjeta azul inclinada con el día de la semana, el día, el
+// mes, el año y la hora, con el sello de lacre en la esquina.
+//
+// Imagen: /imagenes/sello.webp (el sello plateado, recortado de sobre.png).
+//
+// ── DATOS EDITABLES (salen de información.txt) ────────────────
+// Sábado 19 de diciembre de 2026, 19:00
+const diaSemana = "Sábado";
+const dia = "19";
+const mes = "Diciembre";
+const anio = "2026";
+const hora = "19:00 p.m.";
+// ──────────────────────────────────────────────────────────────
+---
+
+<section id="separa-fecha" class="sf-seccion">
+    <div class="sf-texto" id="sf-texto" data-anim="izq">
+        <p class="sf-frase">
+            <span>Separa</span>
+            <span class="sf-esta">esta</span>
+            <span>Fecha!</span>
+        </p>
+        <span class="sf-adorno" aria-hidden="true"></span>
+        <p class="sf-hora">{diaSemana} · {hora}</p>
+    </div>
+
+    <div class="sf-tarjeta" id="sf-tarjeta" data-anim="der" data-delay="0.15">
+        <!-- Dos estrellitas que titilan junto a la tarjeta -->
+        <span class="sf-estrella e1" aria-hidden="true"></span>
+        <span class="sf-estrella e2" aria-hidden="true"></span>
+
+        <div class="sf-marco">
+            <span class="sf-sem">{diaSemana}</span>
+            <span class="sf-fil" aria-hidden="true"></span>
+            <span class="sf-dia">{dia}</span>
+            <span class="sf-mes">{mes}</span>
+            <span class="sf-anio">{anio}</span>
+        </div>
+
+        <img
+            class="sf-sello"
+            data-anim="zoom"
+            data-delay="0.8"
+            src="/imagenes/sello.webp"
+            width="200"
+            height="202"
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+        />
+    </div>
+</section>
+
+<style>
+    /*
+       Fondo declarado como degradado y no como color (modo oscuro
+       forzado). Arranca en el mismo celeste con que termina Detalles.
+       Todo se mide en cqw (% del ancho de la sección).
+    */
+    .sf-seccion {
+        container-type: inline-size;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4cqw;
+        /* Arriba hay aire de sobra para que el sello no se corte */
+        padding: 16cqw 6cqw 14cqw 7cqw;
+        background-image: linear-gradient(180deg, #eaf6fa 0%, #f4fbfd 100%);
+    }
+
+    .sf-texto {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .sf-frase {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 8.4cqw;
+        line-height: 1.05;
+        text-transform: uppercase;
+        color: #8c8c8c;
+        text-shadow:
+            0 2px 3px rgba(0, 0, 0, 0.22),
+            0 0 12px rgba(255, 255, 255, 0.9);
+    }
+
+    .sf-esta {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-weight: 700;
+        font-size: 5cqw;
+        line-height: 1.3;
+    }
+
+    /* Línea fina con rombo dorado, bajo la frase */
+    .sf-adorno {
+        position: relative;
+        display: block;
+        width: 85%;
+        height: 1px;
+        margin: 4cqw 0 3.4cqw;
+        background-image: linear-gradient(
+            90deg,
+            rgba(42, 134, 166, 0),
+            #2a86a6 25%,
+            #2a86a6 75%,
+            rgba(42, 134, 166, 0)
+        );
+    }
+    .sf-adorno::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 6px;
+        height: 6px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background-image: linear-gradient(135deg, #f6e3a1, #c9a24a);
+        box-shadow: 0 0 0 2px #eef8fb;
+    }
+
+    .sf-hora {
+        margin: 0;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-weight: 700;
+        font-size: 4.2cqw;
+        line-height: 1.2;
+        color: #2a86a6;
+    }
+
+    /* La tarjeta azul, inclinada hacia la derecha */
+    .sf-tarjeta {
+        position: relative;
+        width: 50%;
+        flex: none;
+        transform: rotate(5deg);
+        filter: drop-shadow(0 6px 8px rgba(10, 70, 100, 0.35))
+            drop-shadow(0 0 14px rgba(95, 192, 218, 0.35));
+    }
+
+    .sf-marco {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        aspect-ratio: 4 / 5;
+        padding: 3cqw;
+        background-image: linear-gradient(160deg, #2384b3 0%, #135b84 100%);
+        border: 1px solid #0f4c70;
+        color: #ffffff;
+        text-align: center;
+        /* Borde punteado blanco por dentro */
+        outline: 1.2px dotted rgba(255, 255, 255, 0.9);
+        outline-offset: -2.6cqw;
+    }
+
+    .sf-sem {
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 3.4cqw;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #cfe9f4;
+    }
+
+    .sf-fil {
+        display: block;
+        width: 40%;
+        height: 1px;
+        margin: 1.6cqw 0 1cqw;
+        background-image: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+        );
+    }
+
+    .sf-dia,
+    .sf-anio {
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 10cqw;
+        line-height: 1.1;
+        text-shadow:
+            0 0 6px rgba(255, 255, 255, 0.85),
+            0 0 14px rgba(160, 220, 255, 0.7);
+    }
+
+    .sf-mes {
+        font-family: "Great Vibes", cursive;
+        font-size: 8.4cqw;
+        line-height: 1.2;
+        text-shadow:
+            0 0 6px rgba(255, 255, 255, 0.85),
+            0 0 14px rgba(160, 220, 255, 0.7);
+    }
+
+    .sf-sello {
+        position: absolute;
+        top: -8cqw;
+        right: -6cqw;
+        width: 17cqw;
+        height: auto;
+        transform: rotate(-12deg);
+        filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
+    }
+
+    /* Estrellitas de cuatro puntas junto a la tarjeta */
+    .sf-estrella {
+        position: absolute;
+        width: 4.4cqw;
+        height: 4.4cqw;
+        background-image: linear-gradient(#f0c75a, #f0c75a);
+        clip-path: polygon(
+            50% 0%,
+            60% 40%,
+            100% 50%,
+            60% 60%,
+            50% 100%,
+            40% 60%,
+            0% 50%,
+            40% 40%
+        );
+        animation: sfTitilar 3s ease-in-out infinite;
+    }
+    .sf-estrella.e1 {
+        left: -5cqw;
+        bottom: 6cqw;
+    }
+    .sf-estrella.e2 {
+        right: -4cqw;
+        bottom: -3cqw;
+        width: 3cqw;
+        height: 3cqw;
+        animation-delay: -1.4s;
+    }
+
+    @keyframes sfTitilar {
+        0%,
+        100% {
+            transform: scale(0.5);
+            opacity: 0.35;
+        }
+        50% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .sf-estrella {
+            animation: none;
+        }
+    }
+</style>

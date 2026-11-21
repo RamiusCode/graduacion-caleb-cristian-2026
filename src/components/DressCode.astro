@@ -1,0 +1,235 @@
+---
+// src/components/DressCode.astro
+// Va debajo de Detalles: "Dress Code" y la vestimenta pedida, con el mismo
+// estilo de marco fino que el resto de la invitación.
+//
+// El moño es un DIBUJO PROVISORIO (SVG): se reemplaza por una imagen
+// definitiva cuando llegue.
+//
+// ── DATOS EDITABLES (salen de información.txt) ────────────────
+const titulo = "Dress Code";
+const vestimenta = "Traje de Gala";
+// ──────────────────────────────────────────────────────────────
+---
+
+<section id="dress-code" class="dc-seccion">
+    <h2 class="dc-titulo" data-anim="izq">{titulo}</h2>
+    <span
+        class="dc-linea"
+        aria-hidden="true"
+        data-anim="linea"
+        data-delay="0.2"></span>
+
+    <div class="dc-tarjeta" data-anim="abajo" data-delay="0.1">
+        <!-- Moño (provisorio) -->
+        <svg
+            class="dc-mono"
+            data-anim="zoom"
+            data-delay="0.3"
+            viewBox="0 0 160 90"
+            aria-hidden="true"
+        >
+            <defs>
+                <linearGradient id="dc-negro" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#3b3f44"></stop>
+                    <stop offset="1" stop-color="#0d0f12"></stop>
+                </linearGradient>
+                <linearGradient id="dc-oro" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#f6e3a1"></stop>
+                    <stop offset="1" stop-color="#b8903a"></stop>
+                </linearGradient>
+            </defs>
+            <!-- Alas -->
+            <path
+                d="M80 45 C58 18 28 10 12 16 C6 36 6 54 12 74 C28 80 58 72 80 45 Z"
+                fill="url(#dc-negro)"
+                stroke="url(#dc-oro)"
+                stroke-width="2"
+                stroke-linejoin="round"></path>
+            <path
+                d="M80 45 C102 18 132 10 148 16 C154 36 154 54 148 74 C132 80 102 72 80 45 Z"
+                fill="url(#dc-negro)"
+                stroke="url(#dc-oro)"
+                stroke-width="2"
+                stroke-linejoin="round"></path>
+            <!-- Pliegues -->
+            <path d="M20 22 Q50 45 20 68 M140 22 Q110 45 140 68"
+                fill="none" stroke="#5a5f66" stroke-width="1.2" opacity="0.7"></path>
+            <!-- Nudo -->
+            <rect x="68" y="30" width="24" height="30" rx="6"
+                fill="url(#dc-negro)" stroke="url(#dc-oro)" stroke-width="2"></rect>
+            <path d="M74 36 V54" stroke="#5a5f66" stroke-width="1.2"
+                opacity="0.7"></path>
+        </svg>
+
+        <p class="dc-etiqueta" data-anim="der" data-delay="0.4">
+            <span class="dc-fil" aria-hidden="true"></span>
+            <span>Código de vestimenta</span>
+            <span class="dc-fil" aria-hidden="true"></span>
+        </p>
+
+        <p class="dc-vestimenta" data-anim="abajo" data-delay="0.5">
+            {vestimenta}
+        </p>
+    </div>
+</section>
+
+<style>
+    /*
+       Fondo declarado como degradado y no como color (modo oscuro
+       forzado). Empieza y termina en el celeste de las secciones vecinas,
+       así no se nota el corte. Todo se mide en cqw (% del ancho de la
+       sección).
+    */
+    .dc-seccion {
+        container-type: inline-size;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12cqw 5cqw 6cqw;
+        background-image: linear-gradient(
+            180deg,
+            #eaf6fa 0%,
+            #f4fbfd 50%,
+            #eaf6fa 100%
+        );
+    }
+
+    .dc-titulo {
+        margin: 0;
+        font-family: "Great Vibes", cursive;
+        font-weight: 400;
+        font-size: 12.5cqw;
+        line-height: 1.15;
+        color: #2a86a6;
+        text-align: center;
+        text-shadow:
+            0 2px 3px rgba(0, 0, 0, 0.2),
+            0 0 14px rgba(255, 255, 255, 0.9);
+    }
+
+    /* Línea fina con un rombo dorado al centro */
+    .dc-linea {
+        position: relative;
+        display: block;
+        width: 70%;
+        height: 1px;
+        margin: 3cqw 0 8cqw;
+        background-image: linear-gradient(
+            90deg,
+            rgba(42, 134, 166, 0),
+            #2a86a6 20%,
+            #2a86a6 80%,
+            rgba(42, 134, 166, 0)
+        );
+    }
+    .dc-linea::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 7px;
+        height: 7px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background-image: linear-gradient(135deg, #f6e3a1, #c9a24a);
+        box-shadow: 0 0 0 2px #f1f9fc;
+    }
+
+    /* La tarjeta, igual que la de Detalles */
+    .dc-tarjeta {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 9cqw 5cqw 9cqw;
+        border-radius: 6cqw;
+        background-image:
+            linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.7) 0%,
+                rgba(255, 255, 255, 0) 38%
+            ),
+            linear-gradient(
+                180deg,
+                rgba(206, 232, 242, 0.7),
+                rgba(220, 240, 247, 0.5)
+            );
+        box-shadow:
+            0 0 0 1px rgba(42, 134, 166, 0.22),
+            0 8px 18px rgba(30, 100, 140, 0.16);
+    }
+
+    .dc-tarjeta::before {
+        content: "";
+        position: absolute;
+        inset: 2.2cqw;
+        border-radius: 4.2cqw;
+        border: 1px solid rgba(42, 134, 166, 0.28);
+        pointer-events: none;
+    }
+
+    .dc-tarjeta::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: -1.4cqw;
+        width: 2.8cqw;
+        height: 2.8cqw;
+        transform: translateX(-50%) rotate(45deg);
+        background-image: linear-gradient(135deg, #f6e3a1, #c9a24a);
+        box-shadow: 0 0 0 2px #eef8fb;
+    }
+
+    .dc-mono {
+        width: 34cqw;
+        height: auto;
+        filter: drop-shadow(0 4px 5px rgba(10, 40, 60, 0.3));
+    }
+
+    .dc-etiqueta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3cqw;
+        margin: 7cqw 0 0;
+        font-family: "Cinzel", serif;
+        font-weight: 600;
+        font-size: 3.8cqw;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #7d7d7d;
+    }
+    .dc-fil {
+        display: block;
+        width: 9cqw;
+        height: 1px;
+        background-image: linear-gradient(
+            90deg,
+            rgba(125, 125, 125, 0),
+            #8c8c8c
+        );
+    }
+    .dc-fil:last-child {
+        transform: scaleX(-1);
+    }
+
+    /* La vestimenta, grande y en cursiva con el celeste de la invitación */
+    .dc-vestimenta {
+        margin: 2cqw 0 0;
+        font-family: "Great Vibes", cursive;
+        font-size: 14cqw;
+        line-height: 1.2;
+        white-space: nowrap;
+        color: #1f7f9f;
+        background-image: linear-gradient(180deg, #4bb3d1 0%, #14698a 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -webkit-text-stroke: 0.8px #0e5670;
+        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.22))
+            drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+    }
+</style>

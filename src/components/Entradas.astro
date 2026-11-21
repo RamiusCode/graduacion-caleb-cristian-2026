@@ -1,0 +1,176 @@
+---
+// src/components/Entradas.astro
+// Animación de entrada al hacer scroll, para todas las secciones menos la
+// portada. Está en un solo lugar: cada componente solo marca sus piezas.
+//
+// Cómo se marca una pieza:
+//   data-anim="izq | der | arriba | abajo | zoom | linea"   cómo entra
+//   data-delay="0.3"                                         espera (seg.)
+//   data-ya                                                  entra apenas se abre la portada
+//
+// Cada pieza entra por su cuenta apenas aparece por abajo de la pantalla,
+// es decir, solo cuando se BAJA con el scroll: si se sube, aparece sin
+// animación. Al volver a bajar, entra otra vez. Las
+// que se ven juntas entran a la vez, cada una con su propio movimiento:
+// unas por la izquierda, otras por la derecha, otras desde abajo.
+//
+// Hasta que la animación corre, las piezas están ocultas (ver el estilo
+// de abajo); esa regla solo vale si el movimiento está permitido, así que
+// con "reducir movimiento" todo se ve de entrada.
+---
+
+<!-- Se ejecuta antes de que se dibuje nada: oculta las piezas marcadas -->
+<script is:inline>
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("anim");
+    }
+</script>
+
+<style is:global>
+    html.anim [data-anim] {
+        opacity: 0;
+    }
+</style>
+
+<script>
+    import { gsap } from "gsap";
+
+    // Desde dónde arranca cada tipo de entrada, y a qué valor llega
+    const desde: Record<string, Record<string, number>> = {
+        izq: { x: -70 },
+        der: { x: 70 },
+        arriba: { y: -40 },
+        abajo: { y: 50 },
+        zoom: { scale: 0.8 },
+        linea: { scaleX: 0 },
+    };
+    const reposo: Record<string, number> = {
+        x: 0,
+        y: 0,
+        scale: 1,
+        scaleX: 1,
+    };
+
+    const partidaDe = (el: HTMLElement) =>
+        desde[el.dataset.anim ?? "abajo"] ?? desde.abajo;
+
+    function entrar(el: HTMLElement) {
+        const partida = partidaDe(el);
+        const llegada: Record<string, number> = { opacity: 1 };
+        for (const k of Object.keys(partida)) llegada[k] = reposo[k];
+
+        gsap.fromTo(
+            el,
+            { opacity: 0, ...partida },
+            {
+                ...llegada,
+                duration: el.dataset.anim === "zoom" ? 1.5 : 1.2,
+                delay: parseFloat(el.dataset.delay ?? "0"),
+                ease: "power3.out",
+                overwrite: "auto",
+            },
+        );
+    }
+
+    // Al subir y sacar la pieza por abajo, vuelve a su punto de partida:
+    // así, la próxima vez que se baje hasta ella, entra otra vez.
+    function ocultar(el: HTMLElement) {
+        gsap.killTweensOf(el);
+        gsap.set(el, { opacity: 0, ...partidaDe(el) });
+    }
+
+    // Aparece de golpe, sin animación (cuando se llega a ella subiendo)
+    function fijar(el: HTMLElement) {
+        const llegada: Record<string, number> = { opacity: 1 };
+        for (const k of Object.keys(partidaDe(el))) llegada[k] = reposo[k];
+        gsap.killTweensOf(el);
+        gsap.set(el, llegada);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Sin la clase "anim" (movimiento reducido) todo ya está visible
+        if (!document.documentElement.classList.contains("anim")) return;
+
+        const piezas = document.querySelectorAll<HTMLElement>("[data-anim]");
+        const visibles = new WeakSet<HTMLElement>();
+        // Piezas que el observador ya vio en pantalla al menos una vez
+        const vistas = new WeakSet<HTMLElement>();
+
+        const mostrar = (el: HTMLElement) => {
+            if (visibles.has(el)) return;
+            visibles.add(el);
+            entrar(el);
+        };
+
+        const observar = () => {
+            const ojo = new IntersectionObserver(
+                (entradas) => {
+                    for (const e of entradas) {
+                        const el = e.target as HTMLElement;
+                        /*
+                           Por dónde está la pieza respecto de la pantalla:
+                           con el borde de arriba bajo el borde superior de
+                           la pantalla (top > 0) viene entrando por ABAJO, que
+                           es lo que pasa cuando se baja con el scroll.
+                           Si su borde de arriba ya quedó fuera (top <= 0)
+                           viene entrando por ARRIBA: se está subiendo.
+                        */
+                        const porAbajo = e.boundingClientRect.top > 0;
+
+                        if (e.isIntersecting) {
+                            vistas.add(el);
+                            if (visibles.has(el)) continue;
+                            visibles.add(el);
+                            // Solo se anima al bajar; al subir aparece sin más
+                            if (porAbajo) entrar(el);
+                            else fijar(el);
+                        } else if (
+                            vistas.has(el) &&
+                            visibles.has(el) &&
+                            porAbajo
+                        ) {
+                            // Salió por abajo (se subió): queda lista para
+                            // animarse de nuevo cuando se vuelva a bajar.
+                            visibles.delete(el);
+                            ocultar(el);
+                        }
+                    }
+                },
+                { threshold: [0, 0.12], rootMargin: "0px 0px -6% 0px" },
+            );
+            piezas.forEach((p) => ojo.observe(p));
+        };
+
+        /*
+           Al abrirse la portada, las piezas marcadas con data-ya (la foto
+           de debajo de NombresFlores) entran de inmediato, a la vez que
+           NombresFlores, sin esperar a que se baje hasta ellas.
+        */
+        const arrancar = () => {
+            // Solo las que ya están a la vista: si alguna quedó más abajo,
+            // entra al llegar a ella, como las demás.
+            document
+                .querySelectorAll<HTMLElement>("[data-ya]")
+                .forEach((el) => {
+                    if (el.getBoundingClientRect().top < window.innerHeight)
+                        mostrar(el);
+                });
+            observar();
+        };
+
+        /*
+           Con portada, las piezas que ya se ven debajo de ella esperan a
+           que se abra el sobre: si no, la animación correría tapada.
+        */
+        if (
+            (window as any).portadaAbierta ||
+            !document.getElementById("portada-section")
+        ) {
+            arrancar();
+        } else {
+            window.addEventListener("portada-abierta", arrancar, {
+                once: true,
+            });
+        }
+    });
+</script>
